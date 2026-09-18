@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>English Practice - Learn Everyday</title>
+    <style>
+        /* ==========================================================================
+           1. SISTEMA DE DESIGN & VARIÁVEIS CSS (MOBILE-FIRST APP SHELL & iOS SAFE AREAS)
+           ========================================================================== */
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --secondary-dark: #1899d6;
+            --accent: #ff4b4b;
+            --warning: #ff9600;
+            --bg-color: #f7f9fa;
+            --card-bg: #ffffff;
+            --text-main: #4b4b4b;
+            --text-muted: #777777;
+            --border-color: #e5e5e5;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation; /* Evita zoom duplo e melhora toque no iOS */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: calc(75px + env(safe-area-inset-bottom)); /* iOS Safe Area */
+        }
+
+        header {
+            padding: calc(16px + env(safe-area-inset-top)) 20px 16px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-pills {
+            display: flex;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .pill-streak { color: var(--warning); }
+        .pill-score { color: #ffc800; }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .view-content {
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .view-content.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-bottom: 4px solid rgba(0,0,0,0.2);
+            -webkit-appearance: none;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .btn-primary { background-color: var(--primary); color: #fff; }
+        .btn-secondary { background-color: var(--secondary); color: #fff; }
+        .btn-outline { background-color: #fff; border: 2px solid var(--border-color); color: var(--text-main); border-bottom-width: 4px; }
+        .btn-accent { background-color: var(--accent); color: #fff; }
+
+        .btn-speak.listening {
+            background-color: var(--accent);
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .option-btn:hover { border-color: var(--secondary); background-color: #f0f9ff; }
+        .option-btn.selected { border-color: var(--secondary); background-color: #e0f2fe; }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 50px;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border-radius: 12px;
+        }
+
+        .word-chip {
+            padding: 8px 14px;
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 0 var(--border-color);
+        }
+
+        .feedback-box {
+            padding: 16px;
+            border-radius: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            white-space: pre-line;
+        }
+
+        .feedback-box.correct { background-color: #d7ffb8; color: #2e7d32; display: flex; }
+        .feedback-box.incorrect { background-color: #ffdfe0; color: #c62828; display: flex; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            height: calc(65px + env(safe-area-inset-bottom));
+            padding-bottom: env(safe-area-inset-bottom);
+            background-color: #fff;
+            border-top: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .nav-item.active { color: var(--secondary); }
+        .nav-item span { font-size: 1.3rem; }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px; /* Evita zoom automático no Safari iOS */
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="text"]:focus, textarea:focus { border-color: var(--secondary); }
+
+        .vocab-category {
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .vocab-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .banner-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+
+        .badge-card {
+            background: var(--bg-color);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+        .badge-card.unlocked {
+            border-color: var(--warning);
+            background: #fffbe6;
+        }
+
+        .dialogue-bubble {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            max-width: 85%;
+        }
+        .dialogue-a { background: #e0f2fe; align-self: flex-start; }
+        .dialogue-b { background: #d7ffb8; align-self: flex-end; }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        
+        <!-- CABEÇALHO -->
+        <header>
+            <div class="header-title">🇺🇸 English Practice</div>
+            <div class="stats-pills">
+                <span class="pill-streak">🔥 <span id="streak-val">1</span>d</span>
+                <span class="pill-score">⚡ <span id="xp-val">0</span> XP</span>
+            </div>
+        </header>
+
+        <!-- BARRA DE PROGRESSO -->
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="top-progress"></div>
+        </div>
+
+        <!-- VISTA 1: HOME -->
+        <div id="view-home" class="view-content active">
+            
+            <div class="card" style="text-align: center; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); border-color: #bae6fd;">
+                <h2 style="color: var(--secondary-dark);">Practice English every day!</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Pratique vocabulário, escrita, áudio e gramática dos seus estudos diários.</p>
+            </div>
+
+            <!-- Nível & Status -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 800;" id="current-level-title">🌱 Level 1 — Words & Food</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" id="level-count-text">Nível A1</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 5px;">
+                    <div style="background: var(--bg-color); padding: 8px; border-radius: 8px;">
+                        <div style="font-weight: 800; font-size: 1.1rem;" id="stat-done">0</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">Feitos</div>
+                    </div>
+                    <div style="background: var(--bg-color); padding: 8px; border-radius: 8px;">
+                        <div style="font-weight: 800; font-size: 1.1rem; color: var(--primary);" id="stat-hits">0</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">Acertos</div>
+                    </div>
+                    <div style="background: var(--bg-color); padding: 8px; border-radius: 8px;">
+                        <div style="font-weight: 800; font-size: 1.1rem; color: var(--secondary);" id="stat-acc">0%</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">Aproveit.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS DE MODOS -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-secondary" onclick="startMode('pronunciation')">🎤 Pronunciation</button>
+                <button class="btn btn-outline" onclick="startMode('write')">✍️ Writing</button>
+                <button class="btn btn-outline" onclick="startMode('complete')">🧩 Complete</button>
+                <button class="btn btn-outline" onclick="startMode('unscramble')">🔀 Unscramble</button>
+                <button class="btn btn-outline" onclick="startMode('listening')">🎧 Listening</button>
+                <button class="btn btn-outline" onclick="startMode('translation')">📖 Translation</button>
+                <button class="btn btn-outline" onclick="startMode('questions')">❓ Questions</button>
+                <button class="btn btn-outline" onclick="startMode('dialogue')">💬 Dialogue</button>
+                <button class="btn btn-outline" onclick="startMode('truefalse')">📄 True / False</button>
+                <button class="btn btn-outline" onclick="startMode('textprod')">📝 Composition</button>
+            </div>
+
+            <!-- Revisão de erros -->
+            <button class="btn btn-accent" id="btn-review" onclick="startMode('review')" style="display: none;">🔄 Review Mistakes (<span id="review-count">0</span>)</button>
+
+        </div>
+
+        <!-- VISTA 2: AULAS / TEMAS -->
+        <div id="view-lessons" class="view-content">
+            <h2 style="font-size: 1.3rem;">📚 Modules & Topics</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Escolha um tema específico baseado no seu material de estudo:</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;" id="topics-list"></div>
+        </div>
+
+        <!-- VISTA 3: EXERCÍCIOS -->
+        <div id="view-practice" class="view-content">
+            <div id="browser-error" class="banner-error">
+                Para suporte completo a voz no iOS, ative o microfone no Safari e certifique-se de usar o Safari ou Chrome atualizados.
+            </div>
+
+            <div class="card" id="exercise-card"></div>
+
+            <div class="feedback-box" id="feedback-box">
+                <div style="font-weight: 800; font-size: 1.1rem;" id="fb-title">🎉 Great job!</div>
+                <div style="font-size: 0.9rem;" id="fb-msg"></div>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" style="flex: 1; display: none;" id="btn-try-again" onclick="retryExercise()">🔄 Try Again</button>
+                <button class="btn btn-primary" style="flex: 2; display: none;" id="btn-next" onclick="nextExercise()">Next ➔</button>
+            </div>
+        </div>
+
+        <!-- VISTA 4: VOCABULÁRIO -->
+        <div id="view-vocabulary" class="view-content">
+            <h2 style="font-size: 1.3rem;">📚 Food & Verbs Dictionary</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Lista de vocabulário e expressões extraídas do material:</p>
+            
+            <div id="vocab-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <!-- VISTA 5: PROGRESSO -->
+        <div id="view-progress" class="view-content">
+            <h2 style="font-size: 1.3rem;">📊 My Progress</h2>
+            
+            <div class="card">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 2.5rem;">🏆</div>
+                    <div>
+                        <div style="font-size: 1.4rem; font-weight: 800;" id="prog-xp">0 XP</div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem;">Pontuação Total</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 1rem;">Conquistas & Medalhas</h3>
+                <div class="badge-grid" id="badges-container"></div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 1rem;">Níveis de Aprendizagem</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;" id="levels-tree"></div>
+            </div>
+        </div>
+
+        <!-- BARRA INFERIOR -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('home')">
+                <span>🏠</span> Home
+            </button>
+            <button class="nav-item" onclick="switchTab('lessons')">
+                <span>📖</span> Lessons
+            </button>
+            <button class="nav-item" onclick="switchTab('vocabulary')">
+                <span>📚</span> Vocab
+            </button>
+            <button class="nav-item" onclick="switchTab('progress')">
+                <span>📊</span> Progress
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        /* BANCO DE EXERCÍCIOS BASEADO NOS ANEXOS */
+        const exerciseBank = [
+            { id: 1, category: 'Food & Breakfast', level: 1, type: 'pronunciation', target: 'Good morning', tip: 'Suave no "g" final.', explanation: 'Saudação básica matinal.' },
+            { id: 2, category: 'Food & Breakfast', level: 1, type: 'complete', question: 'I drink ___ for breakfast.', options: ['coffee', 'bread', 'pancakes'], answer: 'coffee', explanation: 'Coffee é uma bebida (beber = drink).' },
+            { id: 3, category: 'Food & Breakfast', level: 1, type: 'write', prompt: 'Traduza: "Eu como pão e manteiga."', target: 'I eat bread and butter.', words: ['I', 'eat', 'bread', 'and', 'butter.'], explanation: 'Estrutura: Sujeito + Verbo + Objetos.' },
+            { id: 4, category: 'Food & Breakfast', level: 1, type: 'unscramble', question: 'Ordene a frase:', words: ['pancakes', 'like', 'I', 'to', 'eat'], target: 'I like to eat pancakes', explanation: 'Inicie com o sujeito I.' },
+            { id: 5, category: 'Food & Breakfast', level: 1, type: 'listening', target: 'I drink orange juice.', options: ['I drink orange juice.', 'I drink apple juice.', 'I want orange juice.'], answer: 'I drink orange juice.', explanation: 'Escute a palavra "orange".' },
+            { id: 6, category: 'Food & Breakfast', level: 1, type: 'translation', prompt: 'I want a glass of milk.', target: 'Eu quero um copo de leite.', options: ['Eu quero um copo de leite.', 'Eu bebo um copo de leite.', 'Eu gosto de leite.'], answer: 'Eu quero um copo de leite.', explanation: 'glass of milk = copo de leite.' },
+            { id: 7, category: 'Food & Breakfast', level: 1, type: 'questions', prompt: 'Crie a pergunta para: "I eat eggs for breakfast."', options: ['What do you eat for breakfast?', 'Where do you eat?', 'Do you drink coffee?'], answer: 'What do you eat for breakfast?', explanation: 'Use What para perguntar "O que".' },
+            { id: 8, category: 'Food & Breakfast', level: 1, type: 'complete', question: 'I want a ___ of toast.', options: ['piece', 'glass', 'cup'], answer: 'piece', explanation: 'Usamos "a piece of" para torradas/pães.' },
+            { id: 9, category: 'Food & Breakfast', level: 1, type: 'pronunciation', target: 'I like coffee and tea.', tip: 'Acentue o "fee" e o "tea".', explanation: 'Bebidas quentes de café da manhã.' },
+            { id: 10, category: 'Food & Breakfast', level: 1, type: 'write', prompt: 'Escreva em inglês: "Você quer geleia e mel?"', target: 'Do you want jam and honey?', words: ['Do', 'you', 'want', 'jam', 'and', 'honey?'], explanation: 'Perguntas no presente usam "Do".' },
+            { id: 11, category: 'Food & Breakfast', level: 1, type: 'unscramble', question: 'Monte a pergunta:', words: ['you', 'Do', 'eat', 'bacon?'], target: 'Do you eat bacon?', explanation: 'Do + Sujeito + Verbo.' },
+            { id: 12, category: 'Food & Breakfast', level: 1, type: 'complete', question: 'She ___ tea with honey.', options: ['prefers', 'prefer', 'drink'], answer: 'prefers', explanation: 'Na 3ª pessoa (She), adiciona-se S ao verbo.' },
+            { id: 13, category: 'Food & Breakfast', level: 1, type: 'listening', target: 'Do you prefer coffee or tea?', options: ['Do you prefer coffee or tea?', 'I prefer coffee and tea.', 'Do you want tea?'], answer: 'Do you prefer coffee or tea?', explanation: 'Entonação de pergunta.' },
+            { id: 14, category: 'Food & Breakfast', level: 1, type: 'translation', prompt: 'Eu não bebo refrigerante no café da manhã.', target: "I don't drink soda for breakfast.", options: ["I don't drink soda for breakfast.", "I drink soda for breakfast.", "I don't want soda."], answer: "I don't drink soda for breakfast.", explanation: "Negativa no presente = don't." },
+            { id: 15, category: 'Food & Breakfast', level: 1, type: 'truefalse', text: 'John eats pancakes, bacon, and drinks orange juice every morning.', question: 'John drinks apple juice for breakfast.', answer: false, explanation: 'Falso. No texto ele bebe orange juice.' },
+            { id: 16, category: 'Food & Breakfast', level: 1, type: 'dialogue', dialogueA: 'What do you want for breakfast?', dialogueB: 'I want a slice of bread and coffee.', question: 'O que B quer?', options: ['Pão e café', 'Bacon e chá', 'Panquecas e suco'], answer: 'Pão e café', explanation: 'Slice of bread = fatia de pão.' },
+            { id: 17, category: 'Food & Breakfast', level: 1, type: 'write', prompt: 'Passe para a negativa: "I want to eat sausage."', target: "I don't want to eat sausage.", words: ['I', "don't", 'want', 'to', 'eat', 'sausage.'], explanation: 'Insira "don\'t" antes do verbo.' },
+            { id: 18, category: 'Food & Breakfast', level: 1, type: 'complete', question: 'I need a ___ of coffee.', options: ['cup', 'slice', 'piece'], answer: 'cup', explanation: 'A cup of coffee = uma xícara de café.' },
+            { id: 19, category: 'Food & Breakfast', level: 1, type: 'pronunciation', target: 'I prefer fruit for breakfast.', tip: 'Fruit som de "frút".', explanation: 'Frutas na primeira refeição.' },
+            { id: 20, category: 'Food & Breakfast', level: 1, type: 'textprod', prompt: 'Write about your breakfast:', support: ['I eat...', 'I drink...', 'for breakfast.'], explanation: 'Escreva um pequeno parágrafo.' }
+        ];
+
+        // Gerador para atingir 150 itens dinâmicos
+        const categoriesList = ['Food & Breakfast', 'Lunch & Dinner', 'Grammar & Verbs', 'Daily Routine', 'Family & Home', 'Places & Travel'];
+        const sampleVerbs = ['study', 'speak', 'read', 'cook', 'clean', 'take', 'sleep', 'go', 'see'];
+        const sampleFoods = ['apple', 'banana', 'orange', 'chocolate', 'toast', 'cheese', 'ham', 'butter'];
+
+        for (let i = 21; i <= 150; i++) {
+            const cat = categoriesList[i % categoriesList.length];
+            const verb = sampleVerbs[i % sampleVerbs.length];
+            const food = sampleFoods[i % sampleFoods.length];
+
+            if (i % 5 === 0) {
+                exerciseBank.push({ id: i, category: cat, level: 2, type: 'pronunciation', target: `I ${verb} every day.`, tip: 'Mantenha a fluidez.', explanation: `Treino de fala com ${verb}.` });
+            } else if (i % 5 === 1) {
+                exerciseBank.push({ id: i, category: cat, level: 2, type: 'complete', question: `I want to eat an ___ for a snack.`, options: [food, 'coffee', 'water'], answer: food, explanation: `${food} é um alimento.` });
+            } else if (i % 5 === 2) {
+                exerciseBank.push({ id: i, category: cat, level: 2, type: 'write', prompt: `Traduza: "Eu não gosto de ${food}."`, target: `I don't like ${food}.`, words: ['I', "don't", 'like', `${food}.`], explanation: 'Negativa com don\'t.' });
+            } else if (i % 5 === 3) {
+                exerciseBank.push({ id: i, category: cat, level: 2, type: 'unscramble', question: 'Organize a frase:', words: [food, 'like', 'I', 'to', 'eat'], target: `I like to eat ${food}`, explanation: 'Sujeito + verbos + alimento.' });
+            } else {
+                exerciseBank.push({ id: i, category: cat, level: 2, type: 'listening', target: `Do you want a piece of ${food}?`, options: [`Do you want a piece of ${food}?`, `I eat ${food} every day.`, `Where is the ${food}?`], answer: `Do you want a piece of ${food}?`, explanation: 'Escute a oferta.' });
+            }
+        }
+
+        const vocabBank = [
+            { category: 'Food & Meals', word: 'breakfast', pt: 'café da manhã', example: 'I eat eggs for breakfast.' },
+            { category: 'Food & Meals', word: 'lunch', pt: 'almoço', example: 'We have lunch at noon.' },
+            { category: 'Drinks', word: 'coffee', pt: 'café', example: 'A cup of hot coffee.' },
+            { category: 'Quantifiers', word: 'a piece of', pt: 'um pedaço de', example: 'A piece of pie.' },
+            { category: 'Quantifiers', word: 'a glass of', pt: 'um copo de', example: 'A glass of water.' }
+        ];
+
+        /* ESTADO & LOCALSTORAGE */
+        let appState = { xp: 0, streak: 1, dailyDone: 0, dailyHits: 0, mistakes: [] };
+        let currentExerciseIndex = 0, activeExercise = null, activeModeQueue = [];
+        let isListening = false, recognition = null;
+        let availableVoices = [];
+
+        function loadSavedState() {
+            const saved = localStorage.getItem('english_app_state');
+            if (saved) {
+                try { appState = Object.assign(appState, JSON.parse(saved)); } catch(e){}
+            }
+            updateStatsUI();
+            updateMistakeUI();
+        }
+
+        function saveState() {
+            localStorage.setItem('english_app_state', JSON.stringify(appState));
+        }
+
+        /* AJUSTES ESPECÍFICOS PARA IOS / SAFARI */
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSavedState();
+            initSpeech();
+            initVoicesIOS();
+            renderTopics();
+            renderVocabulary();
+            renderBadges();
+            renderProgressTree();
+
+            // Ativa o áudio no iOS após o primeiro toque do usuário
+            document.body.addEventListener('touchstart', unlockAudioIOS, { once: true });
+            document.body.addEventListener('click', unlockAudioIOS, { once: true });
+        });
+
+        function unlockAudioIOS() {
+            if ('speechSynthesis' in window) {
+                const u = new SpeechSynthesisUtterance('');
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        function initVoicesIOS() {
+            if ('speechSynthesis' in window) {
+                const loadVoices = () => {
+                    availableVoices = window.speechSynthesis.getVoices();
+                };
+                loadVoices();
+                if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                    window.speechSynthesis.onvoiceschanged = loadVoices;
+                }
+            }
+        }
+
+        function initSpeech() {
+            // Suporte para WebKit no Safari iOS
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                document.getElementById('browser-error').style.display = 'block';
+                return;
+            }
+
+            try {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    const btn = document.getElementById('btn-speak-act');
+                    if (btn) {
+                        btn.classList.add('listening');
+                        btn.innerHTML = '🛑 Listening...';
+                    }
+                };
+
+                recognition.onresult = (event) => {
+                    const text = event.results[0][0].transcript;
+                    processSpeechResult(text);
+                };
+
+                recognition.onerror = (e) => {
+                    console.log('Speech error:', e);
+                    stopListeningUI();
+                };
+
+                recognition.onend = () => stopListeningUI();
+            } catch(err) {
+                document.getElementById('browser-error').style.display = 'block';
+            }
+        }
+
+        function stopListeningUI() {
+            isListening = false;
+            const btn = document.getElementById('btn-speak-act');
+            if (btn) {
+                btn.classList.remove('listening');
+                btn.innerHTML = '🎤 Speak';
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Para áudios anteriores
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+
+                // Tenta atribuir voz nativa en-US no iOS
+                if (availableVoices.length > 0) {
+                    const iosVoice = availableVoices.find(v => v.lang.includes('en-US') || v.lang.includes('en_US'));
+                    if (iosVoice) utterance.voice = iosVoice;
+                }
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleSpeech() {
+            if (!recognition) {
+                alert('Reconhecimento de voz não suportado neste navegador iOS. Tente atualizar seu iOS.');
+                return;
+            }
+            if (isListening) recognition.stop();
+            else {
+                try { recognition.start(); } catch(e) { recognition.stop(); }
+            }
+        }
+
+        /* CONTROLE DE VIEWS & MODOS */
+        function switchTab(tabName) {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const targetView = document.getElementById(`view-${tabName}`);
+            if (targetView) targetView.classList.add('active');
+
+            const navIndex = ['home', 'lessons', 'vocabulary', 'progress'].indexOf(tabName);
+            if (navIndex !== -1) {
+                document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+            }
+        }
+
+        function startMode(mode, filterTopic = null) {
+            switchTab('practice');
+
+            if (mode === 'review') {
+                activeModeQueue = exerciseBank.filter(ex => appState.mistakes.includes(ex.id));
+            } else if (filterTopic) {
+                activeModeQueue = exerciseBank.filter(ex => ex.category === filterTopic);
+            } else if (mode) {
+                activeModeQueue = exerciseBank.filter(ex => ex.type === mode);
+            } else {
+                activeModeQueue = [...exerciseBank];
+            }
+
+            currentExerciseIndex = 0;
+            loadNextExercise();
+        }
+
+        function loadNextExercise() {
+            document.getElementById('feedback-box').className = 'feedback-box';
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-try-again').style.display = 'none';
+
+            if (currentExerciseIndex >= activeModeQueue.length) {
+                document.getElementById('exercise-card').innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <h2>🎉 Round Finished!</h2>
+                        <p style="color: var(--text-muted); margin: 10px 0;">Você concluiu este módulo!</p>
+                        <button class="btn btn-primary" onclick="switchTab('home')">Back to Home</button>
+                    </div>
+                `;
+                return;
+            }
+
+            activeExercise = activeModeQueue[currentExerciseIndex];
+            renderExerciseCard(activeExercise);
+            updateTopProgress();
+        }
+
+        function renderExerciseCard(ex) {
+            const card = document.getElementById('exercise-card');
+            card.innerHTML = '';
+
+            if (ex.type === 'pronunciation') {
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — PRONUNCIATION</div>
+                    <div style="font-size: 1.5rem; font-weight: 800; text-align: center; margin: 15px 0;">${ex.target}</div>
+                    <div style="font-size: 0.85rem; color: var(--secondary-dark); background: #f0f9ff; padding: 10px; border-radius: 8px; text-align: center;">💡 ${ex.tip}</div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="speakText('${ex.target}')">🔊 Listen</button>
+                        <button class="btn btn-primary" style="flex: 1;" id="btn-speak-act" onclick="toggleSpeech()">🎤 Speak</button>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85rem; text-align: center; color: var(--text-muted);">You said: <span id="user-said" style="font-weight: bold; color: var(--text-main);">...</span></div>
+                `;
+            } else if (['complete', 'translation', 'questions', 'listening'].includes(ex.type)) {
+                let optionsHTML = ex.options.map(opt => 
+                    `<button class="option-btn" onclick="checkOptionAnswer('${escapeQuotes(opt)}', '${escapeQuotes(ex.answer)}')">${opt}</button>`
+                ).join('');
+
+                let audioHeader = ex.type === 'listening' ? 
+                    `<button class="btn btn-secondary" style="margin-bottom: 10px;" onclick="speakText('${ex.target}')">🔊 Listen Again</button>` : '';
+
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — ${ex.type.toUpperCase()}</div>
+                    ${audioHeader}
+                    <div style="font-size: 1.2rem; font-weight: 700; text-align: center; margin: 15px 0;">${ex.question || ex.prompt || 'Choose correct answer:'}</div>
+                    <div class="options-grid">${optionsHTML}</div>
+                `;
+                if (ex.type === 'listening') speakText(ex.target);
+            } else if (ex.type === 'write') {
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — WRITE</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; text-align: center; margin: 10px 0;">${ex.prompt}</div>
+                    <input type="text" id="write-input" placeholder="Type in English..." autocomplete="off">
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="checkWriteAnswer()">Check Answer</button>
+                `;
+            } else if (ex.type === 'unscramble') {
+                const shuffled = [...ex.words].sort(() => Math.random() - 0.5);
+                let chipsHTML = shuffled.map(w => `<div class="word-chip" onclick="moveWord(this)">${w}</div>`).join('');
+
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — UNSCRAMBLE</div>
+                    <div style="font-size: 1rem; font-weight: 600; text-align: center;">${ex.question}</div>
+                    <div class="word-bank" id="built-zone" style="border: 2px dashed var(--secondary); min-height: 50px;"></div>
+                    <div class="word-bank" id="source-zone">${chipsHTML}</div>
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="checkUnscrambleAnswer()">Check Answer</button>
+                `;
+            } else if (ex.type === 'truefalse') {
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — TRUE OR FALSE</div>
+                    <div style="background: var(--bg-color); padding: 12px; border-radius: 10px; font-style: italic; font-size: 0.95rem;">"${ex.text}"</div>
+                    <div style="font-weight: 700; margin: 10px 0;">Statement: ${ex.question}</div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-outline" style="flex: 1;" onclick="checkTrueFalse(true, ${ex.answer})">✅ True</button>
+                        <button class="btn btn-outline" style="flex: 1;" onclick="checkTrueFalse(false, ${ex.answer})">❌ False</button>
+                    </div>
+                `;
+            } else if (ex.type === 'dialogue') {
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — DIALOGUE</div>
+                    <div style="display: flex; flex-direction: column; margin: 10px 0;">
+                        <div class="dialogue-bubble dialogue-a"><strong>A:</strong> ${ex.dialogueA}</div>
+                        <div class="dialogue-bubble dialogue-b"><strong>B:</strong> ${ex.dialogueB}</div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="speakText('${ex.dialogueA}. ${ex.dialogueB}')" style="margin-bottom: 10px;">🔊 Listen Dialogue</button>
+                    <div style="font-weight: 700; margin-bottom: 8px;">${ex.question}</div>
+                    <div class="options-grid">
+                        ${ex.options.map(opt => `<button class="option-btn" onclick="checkOptionAnswer('${escapeQuotes(opt)}', '${escapeQuotes(ex.answer)}')">${opt}</button>`).join('')}
+                    </div>
+                `;
+            } else if (ex.type === 'textprod') {
+                let supportChips = ex.support.map(s => `<span class="word-chip">${s}</span>`).join(' ');
+                card.innerHTML = `
+                    <div style="font-size: 0.8rem; font-weight: 800; color: var(--secondary);">${ex.category.toUpperCase()} — COMPOSITION</div>
+                    <div style="font-weight: 700; text-align: center;">${ex.prompt}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Useful phrases: ${supportChips}</div>
+                    <textarea id="prod-input" rows="4" placeholder="Write your paragraph here in English..."></textarea>
+                    <button class="btn btn-primary" onclick="checkComposition()">Submit Text</button>
+                `;
+            }
+        }
+
+        /* CHECKERS */
+        function processSpeechResult(userText) {
+            document.getElementById('user-said').innerText = `"${userText}"`;
+            const expected = activeExercise.target;
+            const sim = calculateSimilarity(expected, userText);
+
+            appState.dailyDone++;
+            if (sim >= 70) {
+                appState.dailyHits++;
+                addXP(15);
+                showFeedback(true, `🟢 Pronunciation: ${sim}%`, 'Muito bem! Boa pronúncia.');
+                removeMistake(activeExercise.id);
+            } else {
+                showFeedback(false, `🔴 Pronunciation: ${sim}%`, `Dica: ${activeExercise.tip}\nExpectativa: "${expected}"`);
+                addMistake(activeExercise.id);
+            }
+            saveState();
+            updateStatsUI();
+        }
+
+        function checkOptionAnswer(selected, correct) {
+            appState.dailyDone++;
+            if (selected === correct) {
+                appState.dailyHits++;
+                addXP(10);
+                showFeedback(true, '🎉 Correct!', activeExercise.explanation || 'Excelente!');
+                removeMistake(activeExercise.id);
+            } else {
+                showFeedback(false, '❌ Try again!', `Resposta correta: "${correct}"\n\nExplicação: ${activeExercise.explanation}`);
+                addMistake(activeExercise.id);
+            }
+            saveState();
+            updateStatsUI();
+        }
+
+        function checkWriteAnswer() {
+            const input = document.getElementById('write-input').value.trim();
+            const target = activeExercise.target;
+            appState.dailyDone++;
+
+            const cleanInput = input.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+            const cleanTarget = target.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+
+            if (cleanInput === cleanTarget) {
+                appState.dailyHits++;
+                addXP(15);
+                showFeedback(true, '🟢 Correct!', 'Correto!');
+                removeMistake(activeExercise.id);
+            } else {
+                showFeedback(false, '🟡 Almost correct!', `Gabarito correto: "${target}"\n\nExplicação: ${activeExercise.explanation}`);
+                addMistake(activeExercise.id);
+            }
+            saveState();
+            updateStatsUI();
+        }
+
+        function moveWord(chip) {
+            const sourceZone = document.getElementById('source-zone');
+            const builtZone = document.getElementById('built-zone');
+            if (chip.parentElement.id === 'source-zone') builtZone.appendChild(chip);
+            else sourceZone.appendChild(chip);
+        }
+
+        function checkUnscrambleAnswer() {
+            const builtChips = document.querySelectorAll('#built-zone .word-chip');
+            const constructed = Array.from(builtChips).map(c => c.innerText).join(' ');
+            const target = activeExercise.target;
+
+            appState.dailyDone++;
+            if (constructed.toLowerCase().replace(/[^a-z0-9 ]/g, '') === target.toLowerCase().replace(/[^a-z0-9 ]/g, '')) {
+                appState.dailyHits++;
+                addXP(15);
+                showFeedback(true, '🌟 Excellent!', 'Palavras ordenadas com sucesso!');
+                removeMistake(activeExercise.id);
+            } else {
+                showFeedback(false, '❌ Incorrect', `Ordem correta: "${target}"`);
+                addMistake(activeExercise.id);
+            }
+            saveState();
+            updateStatsUI();
+        }
+
+        function checkTrueFalse(selected, correct) {
+            appState.dailyDone++;
+            if (selected === correct) {
+                appState.dailyHits++;
+                addXP(10);
+                showFeedback(true, '🎉 Correct!', activeExercise.explanation);
+                removeMistake(activeExercise.id);
+            } else {
+                showFeedback(false, '❌ Incorrect', activeExercise.explanation);
+                addMistake(activeExercise.id);
+            }
+            saveState();
+            updateStatsUI();
+        }
+
+        function checkComposition() {
+            const text = document.getElementById('prod-input').value.trim();
+            appState.dailyDone++;
+            if (text.length > 8) {
+                appState.dailyHits++;
+                addXP(20);
+                showFeedback(true, '📝 Great Text!', 'Parabéns por praticar a escrita autônoma!');
+            } else {
+                showFeedback(false, '⚠️ Short Text', 'Escreva pelo menos uma frase completa.');
+            }
+            saveState();
+            updateStatsUI();
+        }
+
+        /* HELPERS */
+        function showFeedback(isSuccess, title, msg) {
+            const fbBox = document.getElementById('feedback-box');
+            fbBox.className = `feedback-box ${isSuccess ? 'correct' : 'incorrect'}`;
+            document.getElementById('fb-title').innerText = title;
+            document.getElementById('fb-msg').innerText = msg;
+
+            document.getElementById('btn-next').style.display = 'block';
+            if (!isSuccess) document.getElementById('btn-try-again').style.display = 'block';
+        }
+
+        function retryExercise() {
+            document.getElementById('feedback-box').className = 'feedback-box';
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-try-again').style.display = 'none';
+            renderExerciseCard(activeExercise);
+        }
+
+        function nextExercise() {
+            currentExerciseIndex++;
+            loadNextExercise();
+        }
+
+        function addXP(amount) { appState.xp += amount; }
+
+        function addMistake(id) {
+            if (!appState.mistakes.includes(id)) {
+                appState.mistakes.push(id);
+                updateMistakeUI();
+            }
+        }
+
+        function removeMistake(id) {
+            appState.mistakes = appState.mistakes.filter(mId => mId !== id);
+            updateMistakeUI();
+        }
+
+        function updateMistakeUI() {
+            const btnReview = document.getElementById('btn-review');
+            const countSpan = document.getElementById('review-count');
+            if (appState.mistakes.length > 0) {
+                btnReview.style.display = 'flex';
+                countSpan.innerText = appState.mistakes.length;
+            } else {
+                btnReview.style.display = 'none';
+            }
+        }
+
+        function updateStatsUI() {
+            document.getElementById('xp-val').innerText = appState.xp;
+            document.getElementById('prog-xp').innerText = `${appState.xp} XP`;
+            document.getElementById('streak-val').innerText = appState.streak;
+            document.getElementById('stat-done').innerText = appState.dailyDone;
+            document.getElementById('stat-hits').innerText = appState.dailyHits;
+            
+            const acc = appState.dailyDone > 0 ? Math.round((appState.dailyHits / appState.dailyDone) * 100) : 0;
+            document.getElementById('stat-acc').innerText = `${acc}%`;
+        }
+
+        function updateTopProgress() {
+            const fill = document.getElementById('top-progress');
+            if (activeModeQueue.length > 0) {
+                fill.style.width = `${(currentExerciseIndex / activeModeQueue.length) * 100}%`;
+            }
+        }
+
+        function calculateSimilarity(str1, str2) {
+            const s1 = str1.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+            const s2 = str2.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+            if (s1 === s2) return 100;
+            if (!s1 || !s2) return 0;
+
+            const track = Array(s2.length + 1).fill(null).map(() => Array(s1.length + 1).fill(null));
+            for (let i = 0; i <= s1.length; i++) track[0][i] = i;
+            for (let j = 0; j <= s2.length; j++) track[j][0] = j;
+
+            for (let j = 1; j <= s2.length; j++) {
+                for (let i = 1; i <= s1.length; i++) {
+                    const indicator = s1[i - 1] === s2[j - 1] ? 0 : 1;
+                    track[j][i] = Math.min(
+                        track[j][i - 1] + 1,
+                        track[j - 1][i] + 1,
+                        track[j - 1][j - 1] + indicator
+                    );
+                }
+            }
+            return Math.max(0, Math.round(((Math.max(s1.length, s2.length) - track[s2.length][s1.length]) / Math.max(s1.length, s2.length)) * 100));
+        }
+
+        function escapeQuotes(str) {
+            return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        /* RENDERS */
+        function renderTopics() {
+            const container = document.getElementById('topics-list');
+            const categories = [...new Set(exerciseBank.map(e => e.category))];
+
+            container.innerHTML = categories.map(cat => `
+                <div class="vocab-item">
+                    <div>
+                        <div style="font-weight: 800;">${cat}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Exercícios do módulo</div>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 8px 14px;" onclick="startMode(null, '${cat}')">Praticar</button>
+                </div>
+            `).join('');
+        }
+
+        function renderVocabulary() {
+            const container = document.getElementById('vocab-list');
+            let currentCat = '';
+
+            vocabBank.forEach(item => {
+                if (item.category !== currentCat) {
+                    currentCat = item.category;
+                    const catTitle = document.createElement('div');
+                    catTitle.className = 'vocab-category';
+                    catTitle.innerText = currentCat;
+                    container.appendChild(catTitle);
+                }
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'vocab-item';
+                itemDiv.innerHTML = `
+                    <div>
+                        <div style="font-weight: 800; font-size: 0.95rem;">${item.word}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">${item.pt}</div>
+                        <div style="font-size: 0.75rem; color: var(--secondary-dark); margin-top: 2px;">e.g., "${item.example}"</div>
+                    </div>
+                    <button class="btn btn-outline" style="padding: 6px 10px;" onclick="speakText('${item.word}')">🔊</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function renderBadges() {
+            const container = document.getElementById('badges-container');
+            const badges = [
+                { icon: '🏆', title: 'First 10', unlocked: appState.dailyDone >= 10 },
+                { icon: '🔥', title: '3 Streak', unlocked: appState.streak >= 3 },
+                { icon: '⭐', title: '20 Correct', unlocked: appState.dailyHits >= 20 },
+                { icon: '🎯', title: '100 XP', unlocked: appState.xp >= 100 },
+                { icon: '👑', title: '500 XP', unlocked: appState.xp >= 500 },
+                { icon: '⚡', title: 'Fast Learner', unlocked: appState.dailyHits >= 50 }
+            ];
+
+            container.innerHTML = badges.map(b => `
+                <div class="badge-card ${b.unlocked ? 'unlocked' : ''}">
+                    <div style="font-size: 1.5rem;">${b.icon}</div>
+                    <div style="font-weight: 700; margin-top: 4px;">${b.title}</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">${b.unlocked ? 'Conquistado' : 'Bloqueado'}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderProgressTree() {
+            const container = document.getElementById('levels-tree');
+            const levels = [
+                { lvl: 'Level 1', name: 'Words & Food', desc: 'Vocabulário essencial' },
+                { lvl: 'Level 2', name: 'Basic Sentences', desc: 'Estruturas de refeições e bebidas' },
+                { lvl: 'Level 3', name: 'Questions & Grammar', desc: 'Negativas e perguntas' }
+            ];
+
+            container.innerHTML = levels.map((l, idx) => `
+                <div class="vocab-item" style="${idx === 0 ? 'border-color: var(--primary);' : ''}">
+                    <div>
+                        <div style="font-weight: 800;">${l.lvl} — ${l.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">${l.desc}</div>
+                    </div>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: ${idx === 0 ? 'var(--primary)' : 'var(--text-muted)'};">
+                        ${idx === 0 ? 'Unlocked' : 'Progressing'}
+                    </span>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
